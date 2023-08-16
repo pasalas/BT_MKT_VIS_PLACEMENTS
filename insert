@@ -21,6 +21,7 @@ SELECT
 , JSON_VALUE(event_data, '$.placement')      AS placement
 , JSON_VALUE(event_data, '$.click_id')       AS click_id
 , JSON_VALUE(event_data, '$.view_id')        AS view_id
+, JSON_VALUE(event_data, '$.creative_id')    AS creative_id
 , event_data
 , CURRENT_TIMESTAMP() AS aud_ins_timestamp
 
