@@ -1,0 +1,50 @@
+SELECT 
+  id
+, ds AS ds_date
+, site AS sit_site_id
+, CAST(C.account_name AS STRING)    AS account_name
+, CAST(C.account_id AS STRING)      AS account_id
+, CAST(B.advertiser_name AS STRING) AS advertiser_name
+, CAST(B.advertiser_id AS STRING)   AS advertiser_id
+, CAST(E.campaign_name AS STRING)   AS campaign_name
+, CAST(E.campaign_id AS STRING)     AS campaign_id
+, CAST(D.line_item_name AS STRING)  AS line_item_name
+, CAST(D.line_item_id AS STRING)    AS line_item_id
+, user_timestamp
+, user_local_timestamp
+, server_timestamp
+, CAST(user.uid AS STRING)     AS uid
+, CAST(user.user_id AS STRING) AS cus_cust_id
+, device.platform
+, event
+, JSON_VALUE(event_data, '$.print_id')       AS print_id
+, JSON_VALUE(event_data, '$.placement')      AS placement
+, JSON_VALUE(event_data, '$.click_id')       AS click_id
+, JSON_VALUE(event_data, '$.view_id')        AS view_id
+, event_data
+, CURRENT_TIMESTAMP() AS aud_ins_timestamp
+
+FROM `meli-bi-data.MELIDATA.ADVERTISING` AS A
+
+LEFT JOIN `meli-bi-data.WHOWNER.LK_ADS_ADVERTISERS` AS B
+ON JSON_VALUE(event_data, '$.advertiser_id') = CAST(B.advertiser_id AS STRING)
+
+LEFT JOIN `meli-bi-data.WHOWNER.LK_ADS_ACCOUNTS` AS C
+ON B.account_id = C.account_id
+
+LEFT JOIN `meli-bi-data.WHOWNER.LK_ADS_LINE_ITEMS` AS D
+ON JSON_VALUE(event_data, '$.line_item_id') = CAST(D.line_item_id AS STRING)
+
+LEFT JOIN `meli-bi-data.WHOWNER.LK_ADS_CAMPAIGNS` AS E
+ON JSON_VALUE(event_data, '$.campaign_id') = CAST(E.campaign_id AS STRING)
+
+WHERE ds >= CURRENT_DATE - 30
+-- AND site IN ('MLB','MLC','MLM','MLA')
+AND 
+    (          (C.account_id=1500 AND B.advertiser_id=2633) -- MLB_Campaigns > Credits B2C
+          OR   (C.account_id=1500 AND B.advertiser_id=2729) -- MLB_Campaigns > VIS (Motors) 
+          OR   (C.account_id=1496 AND B.advertiser_id=2643) -- MLC_Campaigns > VIS
+          OR   (C.account_id=1502 AND B.advertiser_id=2723) -- MLM_Campaings > Motors
+          OR   (C.account_id=1521 AND B.advertiser_id=2776) -- MLA_Campaigns > VIS
+        )
+;
