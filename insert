@@ -22,6 +22,8 @@ CREATE TABLE `meli-bi-data.TMP.BT_MKT_VIS_PLACEMENTS`
   cus_cust_id STRING OPTIONS(description="user_id tracks"),
   device_platform STRING OPTIONS(description="device.platform tracks"),
   event STRING OPTIONS(description="event tracks"),
+  content_source STRING OPTIONS(description="event_data $.content_source"),
+  valid STRING OPTIONS(description="event_data $.valid"),
   print_id STRING OPTIONS(description="event_data $.print_id"),
   placement STRING OPTIONS(description="event_data $.placement"),
   click_id STRING OPTIONS(description="event_data $.click_id"),
@@ -53,6 +55,8 @@ SELECT
 , CAST(user.user_id AS STRING) AS cus_cust_id
 , device.platform
 , event
+, JSON_VALUE(event_data, '$.content_source') AS content_source
+, JSON_VALUE(event_data, '$.valid')          AS valid
 , JSON_VALUE(event_data, '$.print_id')       AS print_id
 , JSON_VALUE(event_data, '$.placement')      AS placement
 , JSON_VALUE(event_data, '$.click_id')       AS click_id
@@ -78,7 +82,7 @@ ON JSON_VALUE(event_data, '$.campaign_id') = CAST(E.campaign_id AS STRING)
 WHERE ds BETWEEN <FECHA_DESDE> AND <FECHA_HASTA>
 AND site IN ('MCO','MLA','MLC','MLB','MLM','MLU')
 AND 
-    (          (C.account_id=1500 AND B.advertiser_id=2633) -- MLB_Campaigns > Credits B2C
+    (          (C.account_id=1500 AND B.advertiser_id=2633) -- MLB_Campaigns > Credits B2Csss
           OR   (C.account_id=1500 AND B.advertiser_id=2729) -- MLB_Campaigns > VIS (Motors) 
           OR   (C.account_id=1496 AND B.advertiser_id=2643) -- MLC_Campaigns > VIS
           OR   (C.account_id=1502 AND B.advertiser_id=2723) -- MLM_Campaings > Motors
