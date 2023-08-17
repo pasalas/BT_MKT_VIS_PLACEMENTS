@@ -1,3 +1,39 @@
+DROP TABLE IF EXISTS `meli-bi-data.TMP.BT_MKT_VIS_PLACEMENTS`
+;
+
+CREATE TABLE `meli-bi-data.TMP.BT_MKT_VIS_PLACEMENTS`
+(
+
+  id STRING OPTIONS(description="id tracks"),
+  ds_date DATE OPTIONS(description="ds tracks"),
+  sit_site_id STRING OPTIONS(description="site tracks"),
+  account_name STRING OPTIONS(description="account_name LK_ADS_ACCOUNTS"),
+  account_id STRING OPTIONS(description="account_id LK_ADS_ACCOUNTS"),
+  advertiser_name STRING OPTIONS(description="advertiser_name LK_ADS_ADVERTISERS"),
+  advertiser_id STRING OPTIONS(description="advertiser_id LK_ADS_ADVERTISERS"),
+  campaign_name STRING OPTIONS(description="campaign_name LK_ADS_CAMPAIGNS"),
+  campaign_id STRING OPTIONS(description="campaign_id LK_ADS_CAMPAIGNS"),
+  line_item_name STRING OPTIONS(description="line_item_name LK_ADS_LINE_ITEMS"),
+  line_item_id STRING OPTIONS(description="line_item_id LK_ADS_LINE_ITEMS"),
+  user_timestamp STRING OPTIONS(description="user_timestamp tracks"),
+  user_local_timestamp STRING OPTIONS(description="user_local_timestamp tracks"),
+  server_timestamp STRING OPTIONS(description="server_timestamp tracks"),
+  uid STRING OPTIONS(description="uid tracks"),
+  cus_cust_id STRING OPTIONS(description="user_id tracks"),
+  device_platform STRING OPTIONS(description="device.platform tracks"),
+  event STRING OPTIONS(description="event tracks"),
+  print_id STRING OPTIONS(description="event_data $.print_id"),
+  placement STRING OPTIONS(description="event_data $.placement"),
+  click_id STRING OPTIONS(description="event_data $.click_id"),
+  view_id STRING OPTIONS(description="event_data $.view_id"),
+  creative_id STRING OPTIONS(description="event_data $.creative_id"),
+  event_data STRING OPTIONS(description="event_data tracks"),
+  aud_ins_timestamp TIMESTAMP OPTIONS(description="timestamp de inserción a la tabla")
+)
+;
+
+INSERT INTO `meli-bi-data.TMP.BT_MKT_VIS_PLACEMENTS`
+
 SELECT 
   id
 , ds AS ds_date
@@ -39,8 +75,8 @@ ON JSON_VALUE(event_data, '$.line_item_id') = CAST(D.line_item_id AS STRING)
 LEFT JOIN `meli-bi-data.WHOWNER.LK_ADS_CAMPAIGNS` AS E
 ON JSON_VALUE(event_data, '$.campaign_id') = CAST(E.campaign_id AS STRING)
 
-WHERE ds >= CURRENT_DATE - 30
--- AND site IN ('MLB','MLC','MLM','MLA')
+WHERE ds BETWEEN <FECHA_DESDE> AND <FECHA_HASTA>
+AND site IN ('MCO','MLA','MLC','MLB','MLM','MLU')
 AND 
     (          (C.account_id=1500 AND B.advertiser_id=2633) -- MLB_Campaigns > Credits B2C
           OR   (C.account_id=1500 AND B.advertiser_id=2729) -- MLB_Campaigns > VIS (Motors) 
